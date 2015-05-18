@@ -1,0 +1,11 @@
+S .
+
+B _build/*
+
+PKG core
+PKG opium
+PKG cow
+PKG cow.syntax
+PKG lwt
+PKG lwt.unix
+PKG sqlite3
