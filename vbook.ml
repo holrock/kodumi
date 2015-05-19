@@ -12,6 +12,7 @@ let html_of_book book =
       </a>
     </h4>
     <h5 class="book-subtitle">$str:Book.subtitle book$</h5>
+    <a href=$str:"/books/" ^ Int64.to_string (Book.id book) ^ "/edit"$>edit</a>
   </hgroup>
 </section>
 >>
@@ -23,10 +24,10 @@ let html_of_book_list books = <:html<
 <a href="/books/new">new book</a>
 >>
 
-let book_form book = <:html<
-  <form action="/books" method="post">
-    <label>Title:<input type="text" name="title">$str:Book.title book$</input></label>
-    <label>Subtitle:<input type="text" name="subtitle">$str:Book.subtitle book$</input></label>
+let book_form ~book ~action = <:html<
+  <form action=$str:action$ method="post">
+    <label>Title:<input type="text" name="title" value=$str:Book.title book$></input></label>
+    <label>Subtitle:<input type="text" name="subtitle" value=$str:Book.subtitle book$></input></label>
     <input type="submit" />
   </form>
 >>
@@ -36,5 +37,5 @@ let list books = View.render (fun () -> html_of_book_list books)
 let show book =
   View.render (fun () -> html_of_book book)
 
-let new_book book =
-  View.render (fun () -> book_form book)
+let edit_book ~book ~action=
+  View.render (fun () -> book_form ~book ~action)

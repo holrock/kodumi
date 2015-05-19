@@ -30,3 +30,10 @@ let save ~db ~book =
   let params = [Db.Data.TEXT (Book.title book);
 		Db.Data.TEXT (Book.subtitle book)] in
   Db.insert ~sql ~params db
+
+let update ~db ~id ~title ~subtitle =
+  let sql = "update books set title =?, subtitle = ? where id = ?" in
+  let params = [Db.Data.TEXT title;
+		Db.Data.TEXT subtitle;
+	       Db.Data.INT id] in
+  Db.update ~sql ~params db

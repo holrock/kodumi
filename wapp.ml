@@ -3,7 +3,7 @@ open Opium.Std
 open Cow
 
 let db = Db.connect "db/db"
-let not_found = respond' (`String "Not found")
+let not_found = respond' ~code:`Not_found (`String "404 Not found")
 let root = get "/" (fun _ -> redirect' (Uri.of_string "/books"))
 
 let book_list =
@@ -18,13 +18,26 @@ let book_info =
 		    | None      -> not_found)
 
 let book_new =
-  get "/books/new" (fun _ -> respond' (`Html
-					(Html.to_string (Cbook.empty ()))))
+  get "/books/new" (fun _ ->
+		    respond' (`Html
+			       (Html.to_string (Cbook.empty ()))))
 
 let book_create =
   post "/books" (fun req ->
 		 App.urlencoded_pairs_of_body req >>| (fun body ->
 		    match Cbook.create ~db ~body with
+		    | Ok _ -> redirect (Uri.of_string "/books")
+		    | Error e -> respond (`String (Error.to_string_hum e))))
+let book_edit =
+  get "/books/:id/edit" (fun req ->
+		     match Cbook.edit ~db ~req with
+		     | Some body -> respond' (`Html (Html.to_string body))
+		     | None -> not_found)
+
+let book_update =
+  post "/books/:id" (fun req ->
+		 App.urlencoded_pairs_of_body req >>| (fun body ->
+		    match Cbook.update ~db ~req ~body with
 		    | Ok _ -> redirect (Uri.of_string "/books")
 		    | Error e -> respond (`String (Error.to_string_hum e))))
 
@@ -38,6 +51,8 @@ let _ =
   |> book_list
   |> book_new
   |> book_create
+  |> book_edit
+  |> book_update
   |> root
   |> middleware (Middleware.static ~local_path:"./static" ~uri_prefix:"/static")
   |> App.run_command

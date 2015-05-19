@@ -78,7 +78,20 @@ let insert ~sql ~params t =
      (match Sqlite3.step stmt with
       | Sqlite3.Rc.OK | Sqlite3.Rc.DONE ->
 	  ignore (Sqlite3.finalize stmt);
-	Ok 1
+	  Ok (Sqlite3.changes t.db)
+      | rc -> ignore (Sqlite3.finalize stmt);
+	      rc_to_error rc
+     )
+  | rc -> rc_to_error rc
+
+let update ~sql ~params t =
+  let stmt = Sqlite3.prepare t.db sql in
+  match bind_params ~params:params ~stmt:stmt with
+  | Sqlite3.Rc.OK ->
+     (match Sqlite3.step stmt with
+      | Sqlite3.Rc.OK | Sqlite3.Rc.DONE ->
+	  ignore (Sqlite3.finalize stmt);
+	  Ok (Sqlite3.changes t.db)
       | rc -> ignore (Sqlite3.finalize stmt);
 	      rc_to_error rc
      )
