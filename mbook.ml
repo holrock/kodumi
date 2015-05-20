@@ -10,8 +10,9 @@ let book_of_row row =
     ~publisher:Publisher.empty
 
 let find ~db =
-  Db.map_row db ~query:"select id,title,subtitle from books"
-    ~f:book_of_row
+  Db.map_row db
+	     ~query:"select id,title,subtitle from books"
+	     ~f:book_of_row
 
 let single ~db ~id =
   match Db.map_row db

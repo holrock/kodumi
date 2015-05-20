@@ -2,8 +2,7 @@ open Core.Std
 open Opium.Std
 open Cow
 
-let html_of_book book =
- <:html<
+let html_of_book book = <:html<
 <section>
   <hgroup>
     <h4 class="book-title">
@@ -32,10 +31,42 @@ let book_form ~book ~action = <:html<
   </form>
 >>
 
+let html_of_review = function
+| Ok review ->
+   <:html<
+    <section class="review">
+    <p>score:$int:Review.score review$</p>
+    <p>$str:Review.body review$</p>
+    <p>$str:Time.to_string_abs ~zone:Time.Zone.local (Review.update_at review)$</p>
+    </section>
+ >>
+| Error e ->
+  <:html<
+      $str:Error.to_string_hum e$
+   >>
+
+let html_of_book_reviews book reviews = <:html<
+<section>
+  <hgroup>
+    <h4 class="book-title">
+      <a href=$str:"/books/" ^ Int64.to_string (Book.id book)$>
+        $str:Book.title book$
+      </a>
+    </h4>
+    <h5 class="book-subtitle">$str:Book.subtitle book$</h5>
+    <a href=$str:"/books/" ^ Int64.to_string (Book.id book) ^ "/edit"$>edit</a>
+  </hgroup>
+  <section class="reviews">
+   <h5>reviews:</h5>
+   $list: List.map ~f:html_of_review reviews$
+  </section>
+</section>
+>>
+
 let list books = View.render (fun () -> html_of_book_list books)
 
-let show book =
-  View.render (fun () -> html_of_book book)
+let show book reviews =
+  View.render (fun () -> html_of_book_reviews book reviews)
 
 let edit_book ~book ~action=
   View.render (fun () -> book_form ~book ~action)

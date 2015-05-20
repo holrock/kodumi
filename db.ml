@@ -49,6 +49,7 @@ let fetch_row ~stmt =
   | rc -> Db_error rc
 
 let map_row ~query ?(params=[]) ~f t =
+  Printf.eprintf "%s\n" query;
   let db = t.db in
   let stmt = Sqlite3.prepare db query in
   let rec fetch stmt f acc =

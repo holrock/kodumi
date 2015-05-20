@@ -25,3 +25,20 @@ create table if not exists book_author
   author_id integer not null,
   primary key (book_id, author_id)
 );
+
+create table if not exists user
+(
+  id integer primary key autoincrement,
+  account_name text not null,
+  name text not null
+);
+
+create table if not exists reviews
+(
+  id integer primary key autoincrement,
+  book_id integer not null,
+  user_id integer not null,
+  score integer not null,
+  body text,
+  update_at date
+);
